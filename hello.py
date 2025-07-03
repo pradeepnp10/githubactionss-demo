@@ -1,1 +1,1 @@
-print("This is a Python script running inside GitHub Actions!")
+print("This is a Python script with  GitHub Actions!")
