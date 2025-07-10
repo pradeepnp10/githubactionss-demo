@@ -1,21 +1,32 @@
-name: Practice Workflow
+name: Deploy to EC2
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
 
 jobs:
-  practice-job:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Show uptime
-        run: uptime
-
-      - name: Show whoami
-        run: whoami
-
-      - name: Run Python script
+      - name: Decode and Save SSH Key
         run: |
-          python3 hello.py
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_KEY_BASE64 }}" | base64 -d > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Add EC2 to known hosts
+        run: |
+          ssh-keyscan -H ec2-13-60-27-36.eu-north-1.compute.amazonaws.com >> ~/.ssh/known_hosts
+
+      - name: Connect and Pull Latest Code
+        run: |
+          ssh -i ~/.ssh/id_rsa ubuntu@ec2-13-60-27-36.eu-north-1.compute.amazonaws.com "
+            cd githubactionss-demo &&
+            git pull origin main &&
+            echo '✅ Code pulled successfully on EC2!'
+          "
