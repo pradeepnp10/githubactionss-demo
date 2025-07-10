@@ -21,11 +21,14 @@ jobs:
 
       - name: Add EC2 to known hosts
         run: |
-          ssh-keyscan -H ec2-13-60-27-36.eu-north-1.compute.amazonaws.com >> ~/.ssh/known_hosts
+          until ssh-keyscan -H ec2-13-48-148-16.eu-north-1.compute.amazonaws.com >> ~/.ssh/known_hosts 2>/dev/null; do
+            echo "Waiting for EC2 SSH to be ready..."
+            sleep 5
+          done
 
       - name: Connect and Pull Latest Code
         run: |
-          ssh -i ~/.ssh/id_rsa ubuntu@ec2-13-60-27-36.eu-north-1.compute.amazonaws.com "
+          ssh -i ~/.ssh/id_rsa ubuntu@ec2-13-48-148-16.eu-north-1.compute.amazonaws.com "
             cd githubactionss-demo &&
             git pull origin main &&
             echo '✅ Code pulled successfully on EC2!'
